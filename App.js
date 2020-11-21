@@ -1,119 +1,46 @@
-import 'react-native-gesture-handler';
-import React, { useEffect, useState } from 'react';
-import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 
-import {SplashScreen} from './screens/SplashScreen';
-// import {darkTheme} from './themes/dark';
-import {AuthContext} from './AuthContext';
-import {UserContext} from './UserContext';
-import {StatusBar} from 'react-native';
-import { LoginScreen } from './screens/LoginScreen';
-import { RegistrationScreen } from './screens/RegistrationScreen';
+import FancyInput from "./components/FancyInput";
 
-const AuthStack = createStackNavigator();
-const LoginStack = createStackNavigator();
+import AppStyle from "./AppStyle";
+import ButtonStyle from "./styles/buttons";
 
-const AuthStackNavigator = () => {
+const styles = StyleSheet.create({
+  ...AppStyle,
+  ...ButtonStyle,
+});
+
+function App(props) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   return (
-    <AuthStack.Navigator
-      mode={'modal'}
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <AuthStack.Screen name={'LoginStack'}>
-        {() => (
-          <LoginStack.Navigator
-            mode={'card'}
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            <LoginStack.Screen name={'Login'} component={LoginScreen} />
-          </LoginStack.Navigator>
-        )}
-      </AuthStack.Screen>
+    <View style={styles.container}>
+      {/* INPUT */}
+      <FancyInput
+        label={"Email address"}
+        style={styles.input}
+        item={'email'}
+        value={email}
+        onSetItem={(key, value) => setEmail(value)}
+      />
 
-      <AuthStack.Screen name={'Registration'} component={RegistrationScreen} />
-    </AuthStack.Navigator>
-  );
-};
+      <FancyInput
+        label={"Password"}
+        style={styles.input}
+        item={'password'}
+        value={password}
+        onSetItem={(key, value) => setPassword(value)}
+        secure={true}
+      />
 
-const MainStack = createStackNavigator();
-const RootStack = createStackNavigator();
-
-const ProductListScreen = () => {
-  return (
-    <View>
-      <Text>PRODUCT LIST</Text>
+      {/* BUTTON */}
+      <TouchableOpacity style={[styles.commonButton, styles.loginButton]}>
+        <Text>Login</Text>
+      </TouchableOpacity>
     </View>
   );
-};
-
-const MainStackNavigator = () => {
-  return (
-    <MainStack.Navigator>
-      <MainStack.Screen
-        name={'ProductsList'}
-        component={ProductListScreen}
-        options={{
-          title: 'Products List',
-        }}
-      />
-    </MainStack.Navigator>
-  );
 }
 
-export default function() {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
-  const [auth, setAuth] = useState(null);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
-  }, []);
-
-  function renderScreens() {
-    if (loading) {
-      return <RootStack.Screen name={'Splash'} component={SplashScreen} />;
-    }
-    // Alert.alert("USER");
-    if (!user) {
-      return <RootStack.Screen name={'AuthStack'} component={AuthStackNavigator} />;
-    }
-
-    // Alert.alert("HAS USER");
-    
-    return (
-      <RootStack.Screen name={'MainStack'}>
-        {() => (
-          <UserContext.Provider value={user}>
-            <MainStackNavigator />
-          </UserContext.Provider>
-        )}
-      </RootStack.Screen>
-    );
-  }
-
-  return (
-    <>
-      <StatusBar />
-      <AuthContext.Provider value={{}}>
-        <NavigationContainer>
-          <RootStack.Navigator
-            screenOptions={{
-              headerShown: false,
-              animationEnabled: false,
-            }}
-          >
-            {renderScreens()}
-          </RootStack.Navigator>
-        </NavigationContainer>
-      </AuthContext.Provider>
-    </>
-  );
-}
+export default App;
